@@ -55,7 +55,7 @@ end
 local function check_same_team(target)
     local placeId = game.PlaceId
 
-    if placeId == 5361853069 then
+    if placeId == 5361853069 then -- Snow Core
         local leaderboard = local_player:FindFirstChild("PlayerGui"):FindFirstChild("LeaderboardUI")
         local leaderboardNew = leaderboard:FindFirstChild("LeaderboardNew")
         local teamA = leaderboardNew:FindFirstChild("TeamAFrame"):FindFirstChild("TeamA"):FindFirstChild("PlayersList")
@@ -86,6 +86,10 @@ local function check_same_team(target)
             if #playerTeams >= 2 then
                 return true
             end
+        end
+    else
+        if target.TeamColor == local_player.TeamColor then
+            return true
         end
     end
     
