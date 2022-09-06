@@ -1,6 +1,6 @@
 local local_player = game:GetService("Players").LocalPlayer
 local mouse = local_player:GetMouse()
-local ProximityPromptService = game:GetService("ProximityPromptService")
+local uis = game:GetService("UserInputService")
 local run_service = game:GetService("RunService")
 local getgenv = getgenv
 local string_char = string.char
@@ -9,6 +9,8 @@ local math_randomseed = math.randomseed
 local raycast = workspace.Raycast
 local instance_new = Instance.new
 local dummy_part = instance_new("Part", nil)
+
+-- randomizer
 
 math_randomseed(tick())
 function random_string(len)
@@ -19,10 +21,12 @@ function random_string(len)
 	return str
 end
 
+getgenv().toggle_key = Enum.KeyCode["E"]
 getgenv().update_loop_stepped_name = random_string(math_random(15, 35))
 
-local ignored_instances = {}
+-- functions I need
 
+local ignored_instances = {}
 local function wall_check(target)
     local raycast_params = RaycastParams.new()
     raycast_params.FilterType = Enum.RaycastFilterType.Blacklist
@@ -96,23 +100,37 @@ local function check_same_team(target)
     return false
 end
 
-local last_tick = 0
+-- uis
 
+local toggled = false
+uis.InputBegan:Connect(function(input, gameProcessedEvent)
+    if not gameProcessedEvent then
+        if input.KeyCode == getgenv().toggle_key then
+            toggled = not toggled
+        end
+    end
+end)
+
+-- render step
+
+local last_tick = 0
 local function stepped()
     if (tick() - last_tick) > (10 / 1000) then
         last_tick = tick()
-        if mouse.Target and mouse.Target.Parent then
-            if mouse.Target:FindFirstChild("Humanoid") or mouse.Target.Parent:FindFirstChild("Humanoid") then
-                local target = game:GetService("Players"):GetPlayerFromCharacter(mouse.Target.Parent)
-                if target then
-                    if not check_same_team(target) then
-                        if wall_check(target) then
-                            mouse1press()
+        if toggled then
+            if mouse.Target and mouse.Target.Parent then
+                if mouse.Target:FindFirstChild("Humanoid") or mouse.Target.Parent:FindFirstChild("Humanoid") then
+                    local target = game:GetService("Players"):GetPlayerFromCharacter(mouse.Target.Parent)
+                    if target then
+                        if not check_same_team(target) then
+                            if wall_check(target) then
+                                mouse1press()
+                            end
                         end
                     end
+                else
+                    mouse1release()
                 end
-            else
-                mouse1release()
             end
         end
     end
